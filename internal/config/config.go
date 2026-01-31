@@ -1,9 +1,7 @@
 package config
 
 import (
-	"errors"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/BurntSushi/toml"
@@ -78,7 +76,7 @@ func Load(path string) (Config, error) {
 	cfg := Defaults()
 	b, err := os.ReadFile(path)
 	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
+		if os.IsNotExist(err) {
 			return cfg, nil
 		}
 		return Config{}, err
@@ -88,71 +86,6 @@ func Load(path string) (Config, error) {
 	}
 	applyDefaults(&cfg)
 	return cfg, nil
-}
-
-func WriteDefaultIfMissing(path string) (bool, error) {
-	if _, err := os.Stat(path); err == nil {
-		return false, nil
-	} else if !errors.Is(err, os.ErrNotExist) {
-		return false, err
-	}
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-		return false, err
-	}
-	def := Defaults()
-	buf := defaultTOML(def)
-	if err := os.WriteFile(path, []byte(buf), 0o644); err != nil {
-		return false, err
-	}
-	return true, nil
-}
-
-func defaultTOML(cfg Config) string {
-	// Keep this stable and human-editable.
-	return "" +
-		"[schedule]\n" +
-		"work_interval = \"" + cfg.Schedule.WorkInterval.Duration().String() + "\"\n" +
-		"break_duration = \"" + cfg.Schedule.BreakDuration.Duration().String() + "\"\n" +
-		"snooze_duration = \"" + cfg.Schedule.SnoozeDuration.Duration().String() + "\"\n" +
-		"min_time_between_popups = \"" + cfg.Schedule.MinTimeBetweenPopups.Duration().String() + "\"\n" +
-		"dismiss_cooldown = \"" + cfg.Schedule.DismissCooldown.Duration().String() + "\"\n" +
-		"\n" +
-		"[quiet_hours]\n" +
-		"enabled = false\n" +
-		"windows = []\n" +
-		"\n" +
-		"[popup]\n" +
-		"title = \"" + escapeTOMLString(cfg.Popup.Title) + "\"\n" +
-		"message = \"" + escapeTOMLString(cfg.Popup.Message) + "\"\n" +
-		"auto_start_break = false\n" +
-		"\n" +
-		"[launch]\n" +
-		"app_id = \"" + escapeTOMLString(cfg.Launch.AppID) + "\"\n" +
-		"title = \"" + escapeTOMLString(cfg.Launch.Title) + "\"\n" +
-		"\n" +
-		"[debug]\n" +
-		"dry_run = false\n" +
-		"log_level = \"info\"\n"
-}
-
-func escapeTOMLString(s string) string {
-	// Minimal escaping for default config generation.
-	// TOML basic strings use backslash for escapes.
-	out := make([]byte, 0, len(s))
-	for i := 0; i < len(s); i++ {
-		b := s[i]
-		switch b {
-		case '\\':
-			out = append(out, '\\', '\\')
-		case '"':
-			out = append(out, '\\', '"')
-		case '\n':
-			out = append(out, '\\', 'n')
-		default:
-			out = append(out, b)
-		}
-	}
-	return string(out)
 }
 
 func applyDefaults(cfg *Config) {

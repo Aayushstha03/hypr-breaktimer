@@ -1,4 +1,4 @@
-module github.com/Aayushstha03/hypr-timer
+module github.com/Aayushstha03/hypr-breaktimer
 
 go 1.25.6
 

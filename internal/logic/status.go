@@ -5,9 +5,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/Aayushstha03/hypr-timer/internal/config"
-	"github.com/Aayushstha03/hypr-timer/internal/state"
-	"github.com/Aayushstha03/hypr-timer/internal/xdg"
+	"github.com/Aayushstha03/hypr-breaktimer/internal/config"
+	"github.com/Aayushstha03/hypr-breaktimer/internal/state"
+	"github.com/Aayushstha03/hypr-breaktimer/internal/xdg"
 )
 
 func Status() error {

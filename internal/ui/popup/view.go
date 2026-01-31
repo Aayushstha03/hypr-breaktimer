@@ -8,11 +8,10 @@ import (
 )
 
 func (m model) View() string {
-	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("230"))
+	titleStyle := lipgloss.NewStyle().Bold(true)
 	boxStyle := lipgloss.NewStyle().
 		Padding(1, 3).
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("241"))
+		Border(lipgloss.RoundedBorder())
 
 	var body string
 	switch m.state {
@@ -52,7 +51,7 @@ func nonEmpty(v, def string) string {
 }
 
 func metaBlock(m model) string {
-	meta := lipgloss.NewStyle().Foreground(lipgloss.Color("244")).Render
+	meta := lipgloss.NewStyle().Render
 	muted := lipgloss.NewStyle().Foreground(lipgloss.Color("242")).Render
 
 	line1 := fmt.Sprintf("break %s | snooze %s", m.breakDuration, m.snoozeDuration)

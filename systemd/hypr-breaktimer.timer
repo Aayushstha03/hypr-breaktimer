@@ -1,0 +1,10 @@
+[Unit]
+Description=Run hypr-breaktimer periodically
+
+[Timer]
+OnBootSec=1m
+OnUnitActiveSec=60s
+Persistent=true
+
+[Install]
+WantedBy=timers.target

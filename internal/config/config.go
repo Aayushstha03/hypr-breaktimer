@@ -65,8 +65,8 @@ func Defaults() Config {
 			AutoStartBreak: false,
 		},
 		Launch: Launch{
-			AppID: "hypr-break",
-			Title: "hypr-break",
+			AppID: "hypr-breaktimer",
+			Title: "hypr-breaktimer",
 		},
 		Debug: Debug{DryRun: false, LogLevel: "info"},
 	}

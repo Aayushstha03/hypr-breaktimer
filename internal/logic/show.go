@@ -113,9 +113,9 @@ func show(ctx context.Context, mode showMode) error {
 
 	exe, err := os.Executable()
 	if err != nil || exe == "" {
-		exe, err = exec.LookPath("hypr-break")
+		exe, err = exec.LookPath("hypr-breaktimer")
 		if err != nil {
-			return errors.New("cannot find hypr-break executable")
+			return errors.New("cannot find hypr-breaktimer executable")
 		}
 	}
 

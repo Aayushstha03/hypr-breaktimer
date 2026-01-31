@@ -1,0 +1,25 @@
+[schedule]
+work_interval = "30m"
+break_duration = "5m"
+snooze_duration = "10m"
+min_time_between_popups = "10m"
+dismiss_cooldown = "15m"
+
+[quiet_hours]
+enabled = false
+windows = [
+  # { start = "22:30", end = "07:30" },
+]
+
+[popup]
+title = "Take a break"
+message = "Stand up, look away from the screen, and stretch."
+auto_start_break = false
+
+[launch]
+app_id = "hypr-breaktimer"
+title = "hypr-breaktimer"
+
+[debug]
+dry_run = false
+log_level = "info"

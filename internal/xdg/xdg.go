@@ -11,7 +11,7 @@ func ConfigFile() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(base, "hypr-break", "config.toml"), nil
+	return filepath.Join(base, "hypr-breaktimer", "config.toml"), nil
 }
 
 func StateFile() (string, error) {
@@ -19,7 +19,7 @@ func StateFile() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(base, "hypr-break", "state.json"), nil
+	return filepath.Join(base, "hypr-breaktimer", "state.json"), nil
 }
 
 func LockFile() (string, error) {
@@ -27,7 +27,7 @@ func LockFile() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(base, "hypr-break", "lock"), nil
+	return filepath.Join(base, "hypr-breaktimer", "lock"), nil
 }
 
 func configHome() (string, error) {

@@ -34,5 +34,5 @@ func InDefaultTerminal(ctx context.Context, opts Options, argv []string) error {
 		return cmd.Start()
 	}
 
-	return errors.New("no terminal launcher found (install xdg-terminal-exec)")
+	return errors.New("no terminal launcher found (setup xdg-terminal-exec)")
 }

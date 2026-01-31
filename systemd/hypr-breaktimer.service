@@ -1,0 +1,6 @@
+[Unit]
+Description=hypr-breaktimer (check if break is due)
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/hypr-breaktimer tick

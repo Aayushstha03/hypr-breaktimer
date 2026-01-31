@@ -60,6 +60,13 @@ func show(ctx context.Context, mode showMode) error {
 
 	now := time.Now()
 	if mode == showDueOnly {
+		if st.DoNotDisturb {
+			return nil
+		}
+		if st.BlockedUntil != nil && now.Before(*st.BlockedUntil) {
+			return nil
+		}
+
 		quietWindows, err := config.ParseQuietWindows(cfg.QuietHours.Windows)
 		if err != nil {
 			return err

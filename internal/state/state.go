@@ -14,6 +14,10 @@ const (
 	ActionStarted   Action = "started"
 	ActionCompleted Action = "completed"
 	ActionSnoozed   Action = "snoozed"
+	ActionBlocked   Action = "blocked"
+	ActionUnblocked Action = "unblocked"
+	ActionDndOn     Action = "dnd_on"
+	ActionDndOff    Action = "dnd_off"
 	ActionDismissed Action = "dismissed"
 	ActionQuit      Action = "quit"
 )
@@ -23,6 +27,8 @@ type State struct {
 	LastBreakCompletedAt *time.Time `json:"last_break_completed_at,omitempty"`
 	LastPopupShownAt     *time.Time `json:"last_popup_shown_at,omitempty"`
 	SnoozedUntil         *time.Time `json:"snoozed_until,omitempty"`
+	BlockedUntil         *time.Time `json:"blocked_until,omitempty"`
+	DoNotDisturb         bool       `json:"do_not_disturb,omitempty"`
 	LastAction           Action     `json:"last_action,omitempty"`
 	LastActionAt         *time.Time `json:"last_action_at,omitempty"`
 }

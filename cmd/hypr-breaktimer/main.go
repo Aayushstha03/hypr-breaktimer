@@ -12,12 +12,14 @@ import (
 )
 
 func usage(w *os.File) {
-	fmt.Fprintln(w, "usage: hypr-breaktimer [show|tick|status]")
+	fmt.Fprintln(w, "usage: hypr-breaktimer [show|tick|status|block|unblock]")
 	fmt.Fprintln(w, "")
 	fmt.Fprintln(w, "commands:")
 	fmt.Fprintln(w, "  show    force opens the popup")
 	fmt.Fprintln(w, "  tick    headless scheduler entrypoint (spawns popup when due)")
 	fmt.Fprintln(w, "  status  print current config/state and next due time")
+	fmt.Fprintln(w, "  block   suppress scheduled popups for a duration (0 = dnd)")
+	fmt.Fprintln(w, "  unblock disable dnd and clear any active block")
 	fmt.Fprintln(w, "")
 	fmt.Fprintln(w, "flags:")
 	fmt.Fprintln(w, "  -h, --help  show this help")
@@ -62,6 +64,24 @@ func main() {
 		}
 	case "status":
 		if err := logic.Status(); err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+	case "block":
+		if len(args) != 2 {
+			usage(os.Stderr)
+			os.Exit(2)
+		}
+		if err := logic.Block(args[1]); err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+	case "unblock":
+		if len(args) != 1 {
+			usage(os.Stderr)
+			os.Exit(2)
+		}
+		if err := logic.Unblock(); err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())
 			os.Exit(1)
 		}

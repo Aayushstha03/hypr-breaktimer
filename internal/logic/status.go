@@ -55,7 +55,11 @@ func Status() error {
 	}
 
 	blocked := ""
-	if inQuiet {
+	if st.DoNotDisturb {
+		blocked = "dnd"
+	} else if st.BlockedUntil != nil && now.Before(*st.BlockedUntil) {
+		blocked = "blocked_until"
+	} else if inQuiet {
 		blocked = "quiet_hours"
 	} else if st.SnoozedUntil != nil && now.Before(*st.SnoozedUntil) {
 		blocked = "snoozed"
@@ -99,6 +103,10 @@ func Status() error {
 	}
 	if st.SnoozedUntil != nil {
 		fmt.Printf("snoozed_until: %s\n", st.SnoozedUntil.Format(time.RFC3339))
+	}
+	fmt.Printf("dnd: %t\n", st.DoNotDisturb)
+	if st.BlockedUntil != nil {
+		fmt.Printf("blocked_until: %s\n", st.BlockedUntil.Format(time.RFC3339))
 	}
 	if st.LastAction != "" {
 		at := ""

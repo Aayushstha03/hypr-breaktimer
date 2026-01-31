@@ -7,6 +7,8 @@ Tiny Go + Bubble Tea break reminder for Hyprland.
 - `hypr-breaktimer show`: force open popup in a new terminal
 - `hypr-breaktimer tick`: headless scheduler entrypoint (spawns popup when due)
 - `hypr-breaktimer status`: print current config/state and next due time
+- `hypr-breaktimer block <duration>`: suppress scheduled popups for a duration (`0` = do not disturb)
+- `hypr-breaktimer unblock`: disable do not disturb and clear any active block
 
 ### Config
 
@@ -17,6 +19,28 @@ Tiny Go + Bubble Tea break reminder for Hyprland.
 
 - Path: `~/.local/state/hypr-breaktimer/state.json`
 - Lock: `~/.local/state/hypr-breaktimer/lock`
+
+### Focus mode
+
+Temporarily suppress scheduled popups (affects `tick` only; `show` still works):
+
+```bash
+hypr-breaktimer block 90m
+hypr-breaktimer block 2h
+```
+
+also supports raw numbers (in minutes): e.g. 120 = 120 minutes = 2 hours
+
+```bash
+hypr-breaktimer block 120
+```
+
+Enable do not disturb until you turn it off:
+
+```bash
+hypr-breaktimer block 0
+hypr-breaktimer unblock
+```
 
 ### Terminal launching
 

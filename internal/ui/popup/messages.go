@@ -93,6 +93,15 @@ var defaultMessages = []string{
 	"Achievement unlocked: Chair Prisoner.",
 }
 
+var exitAttemptMessages = []string{
+	"Nice Try...",
+	"Attempt Denied...",
+	"No (yeah the one with Bugs Bunny)",
+	"Breaks are non-negotiable.",
+	"sudo: permission denied (you are not root, go stretch).",
+	"I am not trapped in here with you, you are trapped in here with me.",
+}
+
 func pickRandomMessage(fallback string) string {
 	if len(defaultMessages) == 0 {
 		return fallback
@@ -105,16 +114,12 @@ func pickRandomMessage(fallback string) string {
 }
 
 func pickRandomExitAttemptMessage() string {
-	exitMessages := []string{
-		"Nice Try...",
-		"Attempt Denied...",
-		"No (yeah the one with Bugs Bunny)",
-		"sudo: permission denied (you are not root, go stretch).",
-		"I am not trapped in here with you, you are trapped in here with me.",
+	if len(exitAttemptMessages) == 0 {
+		return "nice try"
 	}
-	n, err := rand.Int(rand.Reader, big.NewInt(int64(len(exitMessages))))
+	n, err := rand.Int(rand.Reader, big.NewInt(int64(len(exitAttemptMessages))))
 	if err != nil {
-		return exitMessages[0]
+		return exitAttemptMessages[0]
 	}
-	return exitMessages[int(n.Int64())]
+	return exitAttemptMessages[int(n.Int64())]
 }

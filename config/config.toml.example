@@ -16,9 +16,5 @@ message = "Stand up, look away from the screen, and stretch."
 auto_start_break = false
 
 [launch]
-app_id = "hypr-breaktimer"
-title = "hypr-breaktimer"
-
-[debug]
-dry_run = false
-log_level = "info"
+app_id = "hypr-breaktimer-popup"
+title = "hypr-breaktimer-popup"

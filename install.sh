@@ -17,6 +17,9 @@ BIN_PATH="$BIN_DIR/$BIN_NAME"
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/hypr-breaktimer"
 CONFIG_PATH="$CONFIG_DIR/config.toml"
 
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/hypr-breaktimer"
+STATE_PATH="$STATE_DIR/state.json"
+
 SYSTEMD_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
 SERVICE_NAME="hypr-breaktimer.service"
 TIMER_NAME="hypr-breaktimer.timer"
@@ -79,6 +82,23 @@ if [ ! -f "$CONFIG_PATH" ]; then
   fi
 else
   log "Config already exists, leaving it unchanged: $CONFIG_PATH"
+fi
+
+if [ ! -f "$STATE_PATH" ]; then
+  log "Initializing state at $STATE_PATH"
+  mkdir -p "$STATE_DIR"
+
+  now="$(date +"%Y-%m-%dT%H:%M:%S%:z")"
+  tmp_state="$STATE_PATH.tmp.$$"
+  {
+    printf '{\n'
+    printf '  "last_popup_shown_at": "%s"\n' "$now"
+    printf '}\n'
+  } >"$tmp_state"
+  chmod 0644 "$tmp_state" 2>/dev/null || true
+  mv -f "$tmp_state" "$STATE_PATH"
+else
+  log "State already exists, leaving it unchanged: $STATE_PATH"
 fi
 
 if [ "$ENABLE_TIMER" -eq 1 ]; then

@@ -12,7 +12,6 @@ type Config struct {
 	QuietHours QuietHours `toml:"quiet_hours"`
 	Popup      Popup      `toml:"popup"`
 	Launch     Launch     `toml:"launch"`
-	Debug      Debug      `toml:"debug"`
 }
 
 type Schedule struct {
@@ -43,11 +42,6 @@ type Launch struct {
 	Title string `toml:"title"`
 }
 
-type Debug struct {
-	DryRun   bool   `toml:"dry_run"`
-	LogLevel string `toml:"log_level"`
-}
-
 func Defaults() Config {
 	return Config{
 		Schedule: Schedule{
@@ -66,7 +60,6 @@ func Defaults() Config {
 			AppID: "hypr-breaktimer-popup",
 			Title: "hypr-breaktimer-popup",
 		},
-		Debug: Debug{DryRun: false, LogLevel: "info"},
 	}
 }
 
@@ -111,8 +104,5 @@ func applyDefaults(cfg *Config) {
 	}
 	if cfg.Launch.Title == "" {
 		cfg.Launch.Title = def.Launch.Title
-	}
-	if cfg.Debug.LogLevel == "" {
-		cfg.Debug.LogLevel = def.Debug.LogLevel
 	}
 }

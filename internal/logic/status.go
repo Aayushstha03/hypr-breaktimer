@@ -54,6 +54,8 @@ func Status() error {
 		nextDue = &t
 	}
 
+	nextPopup, nextPopupReason := computeNextPopup(now, cfg, st, inQuiet, nextDue)
+
 	blocked := ""
 	if st.DoNotDisturb {
 		blocked = "dnd"
@@ -116,11 +118,51 @@ func Status() error {
 	} else {
 		fmt.Printf("next_due: unknown (no reference time yet)\n")
 	}
+	if nextPopupReason != "" {
+		fmt.Printf("next_popup: %s\n", nextPopupReason)
+	} else if nextPopup != nil {
+		fmt.Printf("next_popup: %s (in %s)\n", nextPopup.Format(time.RFC3339), humanDuration(nextPopup.Sub(now)))
+	}
 
 	if blocked != "" {
 		fmt.Printf("blocked_by: %s\n", blocked)
 	}
 	return nil
+}
+
+func computeNextPopup(now time.Time, cfg config.Config, st state.State, inQuiet bool, nextDue *time.Time) (*time.Time, string) {
+	if st.DoNotDisturb {
+		return nil, "disabled (dnd)"
+	}
+	if inQuiet {
+		return nil, "blocked (quiet_hours)"
+	}
+	// Earliest time we can show is max(nextDue, snoozed_until, blocked_until, last_popup+min_gap, now)
+	var t time.Time
+	if nextDue != nil {
+		t = *nextDue
+	} else {
+		t = now
+	}
+	if st.SnoozedUntil != nil && st.SnoozedUntil.After(t) {
+		t = *st.SnoozedUntil
+	}
+	if st.BlockedUntil != nil && st.BlockedUntil.After(t) {
+		t = *st.BlockedUntil
+	}
+	if st.LastPopupShownAt != nil {
+		minGap := cfg.Schedule.MinTimeBetweenPopups.Duration()
+		if minGap > 0 {
+			g := st.LastPopupShownAt.Add(minGap)
+			if g.After(t) {
+				t = g
+			}
+		}
+	}
+	if t.Before(now) {
+		t = now
+	}
+	return &t, ""
 }
 
 func humanDuration(d time.Duration) string {

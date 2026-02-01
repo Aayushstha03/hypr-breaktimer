@@ -3,16 +3,13 @@ package launch
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 	"os/exec"
-	"strings"
 )
 
 type Options struct {
 	AppID string
 	Title string
-	Debug bool
 }
 
 func InDefaultTerminal(ctx context.Context, opts Options, argv []string) error {
@@ -34,18 +31,7 @@ func InDefaultTerminal(ctx context.Context, opts Options, argv []string) error {
 		args = append(args, argv...)
 		cmd := exec.CommandContext(ctx, "xdg-terminal-exec", args...)
 		cmd.Env = os.Environ()
-		if !opts.Debug {
-			return cmd.Start()
-		}
-		out, err := cmd.CombinedOutput()
-		if err != nil {
-			msg := strings.TrimSpace(string(out))
-			if msg != "" {
-				return fmt.Errorf("xdg-terminal-exec failed: %w: %s", err, msg)
-			}
-			return fmt.Errorf("xdg-terminal-exec failed: %w", err)
-		}
-		return nil
+		return cmd.Start()
 	}
 
 	return errors.New("no terminal launcher found (setup xdg-terminal-exec)")

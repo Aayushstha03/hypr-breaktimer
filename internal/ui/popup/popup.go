@@ -2,11 +2,13 @@ package popup
 
 import (
 	"context"
+	"math"
 	"time"
 
 	"github.com/Aayushstha03/hypr-breaktimer/internal/config"
 	"github.com/Aayushstha03/hypr-breaktimer/internal/state"
 	"github.com/Aayushstha03/hypr-breaktimer/internal/xdg"
+	"github.com/charmbracelet/bubbles/progress"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -68,11 +70,11 @@ type model struct {
 	breakDuration  time.Duration
 	breakEndsAt    time.Time
 	snoozeDuration time.Duration
+	breakProgress  float64
+	progress       progress.Model
 
-	title      string
-	message    string
-	configPath string
-
+	title     string
+	message   string
 	statePath string
 
 	lastPopupShownAt     *time.Time
@@ -86,17 +88,21 @@ type model struct {
 }
 
 func newModel(cfg config.Config) model {
-	configPath, _ := xdg.ConfigFile()
 	statePath := mustStatePath()
 	st, _ := state.Load(statePath)
+
+	pm := progress.New(progress.WithoutPercentage())
+	pm.FullColor = "6"  // ANSI cyan (theme-defined)
+	pm.EmptyColor = "8" // ANSI bright black (theme-defined)
 
 	return model{
 		state:                statePrompt,
 		breakDuration:        cfg.Schedule.BreakDuration.Duration(),
 		snoozeDuration:       cfg.Schedule.SnoozeDuration.Duration(),
+		breakProgress:        0,
+		progress:             pm,
 		title:                cfg.Popup.Title,
 		message:              cfg.Popup.Message,
-		configPath:           configPath,
 		statePath:            statePath,
 		lastPopupShownAt:     st.LastPopupShownAt,
 		lastBreakStartedAt:   st.LastBreakStartedAt,
@@ -131,11 +137,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch s {
 		case "ctrl+c", "esc", "q":
 			// Treat quitting as break taken (except snooze).
-			if m.state == stateBreaking {
-				m.state = stateDone
-				m.writeAction(state.ActionCompleted)
-				return m, doneCmd()
-			}
 			m.writeAction(state.ActionCompleted)
 			m.exitCode = 0
 			return m, tea.Quit
@@ -146,6 +147,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "enter", "b":
 				m.state = stateBreaking
 				m.breakEndsAt = time.Now().Add(m.breakDuration)
+				m.breakProgress = 0
 				m.writeAction(state.ActionStarted)
 				return m, tickCmd()
 			case "s":
@@ -163,18 +165,51 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case stateDone:
 			return m, tea.Quit
 		}
+	case progress.FrameMsg:
+		if m.state != stateBreaking {
+			return m, nil
+		}
+		progressModel, cmd := m.progress.Update(msg)
+		m.progress = progressModel.(progress.Model)
+		return m, cmd
 	case tickMsg:
 		if m.state != stateBreaking {
 			return m, nil
 		}
+
+		m.breakProgress = clamp01(breakProgress(m.breakDuration, m.breakEndsAt, time.Now()))
+		progressCmd := m.progress.SetPercent(m.breakProgress)
+
 		if time.Now().After(m.breakEndsAt) {
 			m.state = stateDone
 			m.writeAction(state.ActionCompleted)
 			return m, doneCmd()
 		}
-		return m, tickCmd()
+		return m, tea.Batch(tickCmd(), progressCmd)
 	}
 	return m, nil
+}
+
+func breakProgress(d time.Duration, endsAt time.Time, now time.Time) float64 {
+	if d <= 0 {
+		return 1
+	}
+	startedAt := endsAt.Add(-d)
+	elapsed := now.Sub(startedAt)
+	return float64(elapsed) / float64(d)
+}
+
+func clamp01(v float64) float64 {
+	if math.IsNaN(v) || math.IsInf(v, 0) {
+		return 0
+	}
+	if v < 0 {
+		return 0
+	}
+	if v > 1 {
+		return 1
+	}
+	return v
 }
 
 func (m *model) writeAction(a state.Action) {

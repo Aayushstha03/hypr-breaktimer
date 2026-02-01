@@ -8,27 +8,37 @@ import (
 )
 
 func (m model) View() string {
-	titleStyle := lipgloss.NewStyle().Bold(true)
+	accent := lipgloss.Color("6")
+	mutedC := lipgloss.Color("8")
+	muted := lipgloss.NewStyle().Foreground(mutedC).Render
+
+	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(accent)
+	dividerStyle := lipgloss.NewStyle().Foreground(mutedC)
+	progressStyle := lipgloss.NewStyle().Foreground(accent)
 	boxStyle := lipgloss.NewStyle().
 		Padding(1, 3).
-		Border(lipgloss.RoundedBorder())
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(accent)
+
+	divider := dividerStyle.Render("\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500")
 
 	var body string
 	switch m.state {
 	case statePrompt:
-		body = titleStyle.Render(nonEmpty(m.title, "Take a break")) + "\n\n" +
+		body = titleStyle.Render(nonEmpty(m.title, "Take a break")) + "\n" +
+			muted(fmt.Sprintf("for %s", m.breakDuration)) + "\n\n" +
 			nonEmpty(m.message, "Stand up, look away from the screen, and stretch.") + "\n\n" +
-			metaBlock(m) + "\n\n" +
-			"b / enter  start break\n" +
-			fmt.Sprintf("s          snooze (%s)\n", m.snoozeDuration) +
-			"q / esc    quit"
+			divider + "\n" +
+			muted("b / enter  start break") + "\n" +
+			muted(fmt.Sprintf("s          snooze (%s)", m.snoozeDuration)) + "\n" +
+			muted("q / esc    quit")
 	case stateBreaking:
 		remaining := max(time.Until(m.breakEndsAt), 0)
+		bar := progressStyle.Render(m.progress.ViewAs(m.breakProgress))
 		body = titleStyle.Render("Break in progress") + "\n\n" +
-			fmt.Sprintf("Time left: %s\n\n", roundSeconds(remaining)) +
-			metaBlock(m) + "\n\n" +
-			"e          end early\n" +
-			"q / esc    quit (counts as completed)"
+			fmt.Sprintf("%s\n", roundSeconds(remaining)) +
+			bar + "\n\n" +
+			muted("e          end early (counts as a break taken)")
 	case stateDone:
 		body = titleStyle.Render("Nice.") + "\n\n" + "Break complete."
 	default:
@@ -47,54 +57,6 @@ func nonEmpty(v, def string) string {
 		return def
 	}
 	return v
-}
-
-func metaBlock(m model) string {
-	meta := lipgloss.NewStyle().Render
-	muted := lipgloss.NewStyle().Foreground(lipgloss.Color("242")).Render
-
-	line1 := fmt.Sprintf("break %s | snooze %s", m.breakDuration, m.snoozeDuration)
-
-	cfg := m.configPath
-	if cfg == "" {
-		cfg = "(unknown config path)"
-	}
-	st := m.statePath
-	if st == "" {
-		st = "(unknown state path)"
-	}
-
-	line2 := fmt.Sprintf("cfg: %s", cfg)
-	line3 := fmt.Sprintf("state: %s", st)
-
-	line4 := ""
-	if m.lastPopupShownAt != nil {
-		line4 = fmt.Sprintf("last popup: %s", m.lastPopupShownAt.Format(time.RFC3339))
-	}
-	line5 := ""
-	if m.snoozedUntil != nil {
-		line5 = fmt.Sprintf("snoozed until: %s", m.snoozedUntil.Format(time.RFC3339))
-	}
-	line6 := ""
-	if m.lastAction != "" {
-		at := ""
-		if m.lastActionAt != nil {
-			at = m.lastActionAt.Format(time.RFC3339)
-		}
-		line6 = fmt.Sprintf("last action: %s %s", m.lastAction, at)
-	}
-
-	out := meta(line1) + "\n" + muted(line2) + "\n" + muted(line3)
-	if line4 != "" {
-		out += "\n" + meta(line4)
-	}
-	if line5 != "" {
-		out += "\n" + meta(line5)
-	}
-	if line6 != "" {
-		out += "\n" + meta(line6)
-	}
-	return out
 }
 
 func roundSeconds(d time.Duration) string {

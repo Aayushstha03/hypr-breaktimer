@@ -18,8 +18,6 @@ const (
 	ActionUnblocked Action = "unblocked"
 	ActionDndOn     Action = "dnd_on"
 	ActionDndOff    Action = "dnd_off"
-	ActionDismissed Action = "dismissed"
-	ActionQuit      Action = "quit"
 )
 
 type State struct {

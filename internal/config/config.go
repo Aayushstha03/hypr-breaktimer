@@ -20,7 +20,6 @@ type Schedule struct {
 	BreakDuration        Duration `toml:"break_duration"`
 	SnoozeDuration       Duration `toml:"snooze_duration"`
 	MinTimeBetweenPopups Duration `toml:"min_time_between_popups"`
-	DismissCooldown      Duration `toml:"dismiss_cooldown"`
 }
 
 type QuietHours struct {
@@ -56,7 +55,6 @@ func Defaults() Config {
 			BreakDuration:        MustDuration(5 * time.Minute),
 			SnoozeDuration:       MustDuration(10 * time.Minute),
 			MinTimeBetweenPopups: MustDuration(10 * time.Minute),
-			DismissCooldown:      MustDuration(15 * time.Minute),
 		},
 		QuietHours: QuietHours{Enabled: false},
 		Popup: Popup{
@@ -65,8 +63,8 @@ func Defaults() Config {
 			AutoStartBreak: false,
 		},
 		Launch: Launch{
-			AppID: "hypr-breaktimer",
-			Title: "hypr-breaktimer",
+			AppID: "hypr-breaktimer-popup",
+			Title: "hypr-breaktimer-popup",
 		},
 		Debug: Debug{DryRun: false, LogLevel: "info"},
 	}
@@ -101,9 +99,6 @@ func applyDefaults(cfg *Config) {
 	}
 	if cfg.Schedule.MinTimeBetweenPopups.Duration() < 0 {
 		cfg.Schedule.MinTimeBetweenPopups = def.Schedule.MinTimeBetweenPopups
-	}
-	if cfg.Schedule.DismissCooldown.Duration() < 0 {
-		cfg.Schedule.DismissCooldown = def.Schedule.DismissCooldown
 	}
 	if cfg.Popup.Title == "" {
 		cfg.Popup.Title = def.Popup.Title

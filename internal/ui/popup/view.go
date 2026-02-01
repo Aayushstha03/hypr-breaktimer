@@ -20,8 +20,7 @@ func (m model) View() string {
 			nonEmpty(m.message, "Stand up, look away from the screen, and stretch.") + "\n\n" +
 			metaBlock(m) + "\n\n" +
 			"b / enter  start break\n" +
-			"s          snooze\n" +
-			"d          dismiss\n" +
+			fmt.Sprintf("s          snooze (%s)\n", m.snoozeDuration) +
 			"q / esc    quit"
 	case stateBreaking:
 		remaining := max(time.Until(m.breakEndsAt), 0)
@@ -29,7 +28,7 @@ func (m model) View() string {
 			fmt.Sprintf("Time left: %s\n\n", roundSeconds(remaining)) +
 			metaBlock(m) + "\n\n" +
 			"e          end early\n" +
-			"q / esc    quit"
+			"q / esc    quit (counts as completed)"
 	case stateDone:
 		body = titleStyle.Render("Nice.") + "\n\n" + "Break complete."
 	default:

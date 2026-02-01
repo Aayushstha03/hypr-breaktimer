@@ -69,12 +69,7 @@ func Status() error {
 			blocked = "min_time_between_popups"
 		}
 	}
-	if blocked == "" && st.LastAction == state.ActionDismissed && st.LastActionAt != nil {
-		cd := cfg.Schedule.DismissCooldown.Duration()
-		if cd > 0 && now.Sub(*st.LastActionAt) < cd {
-			blocked = "dismiss_cooldown"
-		}
-	}
+	// no dismiss cooldown
 
 	fmt.Printf("now: %s\n", now.Format(time.RFC3339))
 	if cfgErr == nil {

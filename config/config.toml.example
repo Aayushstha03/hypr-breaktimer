@@ -3,7 +3,6 @@ work_interval = "30m"
 break_duration = "5m"
 snooze_duration = "10m"
 min_time_between_popups = "10m"
-dismiss_cooldown = "15m"
 
 [quiet_hours]
 enabled = false

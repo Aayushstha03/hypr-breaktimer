@@ -42,6 +42,8 @@ hypr-breaktimer block 0
 hypr-breaktimer unblock
 ```
 
+Note: closing the popup (quit) counts as completing a break for scheduling.
+
 ### Terminal launching
 
 - `show`/`tick` open the UI in a new terminal.

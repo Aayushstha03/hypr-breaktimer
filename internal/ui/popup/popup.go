@@ -130,7 +130,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		s := msg.String()
 		switch s {
 		case "ctrl+c", "esc", "q":
-			m.writeAction(state.ActionQuit)
+			// Treat quitting as break taken (except snooze).
+			if m.state == stateBreaking {
+				m.state = stateDone
+				m.writeAction(state.ActionCompleted)
+				return m, doneCmd()
+			}
+			m.writeAction(state.ActionCompleted)
 			m.exitCode = 0
 			return m, tea.Quit
 		}
@@ -142,12 +148,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.breakEndsAt = time.Now().Add(m.breakDuration)
 				m.writeAction(state.ActionStarted)
 				return m, tickCmd()
-			case "s", "d":
-				if s == "s" {
-					m.writeSnooze(m.snoozeDuration)
-				} else {
-					m.writeAction(state.ActionDismissed)
-				}
+			case "s":
+				m.writeSnooze(m.snoozeDuration)
 				m.exitCode = 0
 				return m, tea.Quit
 			}

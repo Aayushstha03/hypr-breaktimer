@@ -35,8 +35,12 @@ func Run(ctx context.Context, _ Options) (int, error) {
 	m.lastActionAt = st.LastActionAt
 	// respect config auto-start
 	if cfg.Popup.AutoStartBreak {
+		startedAt := time.Now()
 		m.state = stateBreaking
-		m.breakEndsAt = time.Now().Add(m.breakDuration)
+		m.breakEndsAt = startedAt.Add(m.breakDuration)
+		m.breakProgress = 0
+		m.earlyExitBlocks = 0
+		m.nudge = ""
 		m.writeAction(state.ActionStarted)
 	}
 	p := tea.NewProgram(m, tea.WithAltScreen())
@@ -67,11 +71,13 @@ type model struct {
 	width  int
 	height int
 
-	breakDuration  time.Duration
-	breakEndsAt    time.Time
-	snoozeDuration time.Duration
-	breakProgress  float64
-	progress       progress.Model
+	breakDuration   time.Duration
+	breakEndsAt     time.Time
+	snoozeDuration  time.Duration
+	earlyExitBlocks int
+	nudge           string
+	breakProgress   float64
+	progress        progress.Model
 
 	title     string
 	message   string
@@ -102,7 +108,7 @@ func newModel(cfg config.Config) model {
 		breakProgress:        0,
 		progress:             pm,
 		title:                cfg.Popup.Title,
-		message:              cfg.Popup.Message,
+		message:              pickRandomMessage(cfg.Popup.Message),
 		statePath:            statePath,
 		lastPopupShownAt:     st.LastPopupShownAt,
 		lastBreakStartedAt:   st.LastBreakStartedAt,
@@ -123,6 +129,9 @@ func mustStatePath() string {
 }
 
 func (m model) Init() tea.Cmd {
+	if m.state == stateBreaking {
+		return tickCmd()
+	}
 	return nil
 }
 
@@ -145,9 +154,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case statePrompt:
 			switch s {
 			case "enter", "b":
+				startedAt := time.Now()
 				m.state = stateBreaking
-				m.breakEndsAt = time.Now().Add(m.breakDuration)
+				m.breakEndsAt = startedAt.Add(m.breakDuration)
 				m.breakProgress = 0
+				m.earlyExitBlocks = 0
+				m.nudge = ""
 				m.writeAction(state.ActionStarted)
 				return m, tickCmd()
 			case "s":
@@ -158,6 +170,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case stateBreaking:
 			switch s {
 			case "e":
+				if m.earlyExitBlocks == 0 {
+					m.earlyExitBlocks++
+					m.nudge = pickRandomExitAttemptMessage()
+					return m, nil
+				}
 				m.state = stateDone
 				m.writeAction(state.ActionCompleted)
 				return m, doneCmd()

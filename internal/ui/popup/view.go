@@ -9,15 +9,18 @@ import (
 
 func (m model) View() string {
 	accent := lipgloss.Color("6")
+	accentSuccess := lipgloss.Color("10")
 	mutedC := lipgloss.Color("8")
 	muted := lipgloss.NewStyle().Foreground(mutedC).Render
 
+	motivationStyle := lipgloss.NewStyle().Bold(true).Foreground(accentSuccess)
+	nudgeStyle := lipgloss.NewStyle().Bold(true).Foreground(accentSuccess)
 	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(accent)
 	dividerStyle := lipgloss.NewStyle().Foreground(mutedC)
 	progressStyle := lipgloss.NewStyle().Foreground(accent)
 	boxStyle := lipgloss.NewStyle().
 		Padding(1, 3).
-		Border(lipgloss.RoundedBorder()).
+		Border(lipgloss.ThickBorder()).
 		BorderForeground(accent)
 
 	divider := dividerStyle.Render("\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500")
@@ -25,9 +28,9 @@ func (m model) View() string {
 	var body string
 	switch m.state {
 	case statePrompt:
-		body = titleStyle.Render(nonEmpty(m.title, "Take a break")) + "\n" +
+		body = motivationStyle.Render(nonEmpty(m.message, "Stand up, look away from the screen, and stretch.")) + "\n\n" +
+			titleStyle.Render(nonEmpty(m.title, "Take a break")) + "\n" +
 			muted(fmt.Sprintf("for %s", m.breakDuration)) + "\n\n" +
-			nonEmpty(m.message, "Stand up, look away from the screen, and stretch.") + "\n\n" +
 			divider + "\n" +
 			muted("b / enter  start break") + "\n" +
 			muted(fmt.Sprintf("s          snooze (%s)", m.snoozeDuration)) + "\n" +
@@ -35,7 +38,12 @@ func (m model) View() string {
 	case stateBreaking:
 		remaining := max(time.Until(m.breakEndsAt), 0)
 		bar := progressStyle.Render(m.progress.ViewAs(m.breakProgress))
+		nudge := ""
+		if m.nudge != "" {
+			nudge = nudgeStyle.Render(m.nudge) + "\n\n"
+		}
 		body = titleStyle.Render("Break in progress") + "\n\n" +
+			nudge +
 			fmt.Sprintf("%s\n", roundSeconds(remaining)) +
 			bar + "\n\n" +
 			muted("e          end early (counts as a break taken)")

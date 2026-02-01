@@ -71,7 +71,7 @@ Dependencies (Arch examples):
 Install (per-user, to `~/.local/bin`):
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/Aayushstha03/hypr-breaktimer
 cd hypr-breaktimer
 ./install.sh
 ```

@@ -2,9 +2,21 @@
 
 Tiny Go + Bubble Tea break reminder for Hyprland.
 
+### About
+
+`hypr-breaktimer` is a tiny, terminal-based break reminder designed to fit into a Hyprland workflow without getting in your way.
+
+- Runs headless on a timer (`tick`) and only opens a UI when a break is due.
+- Uses a simple, motivational popup you can interact with via keyboard (start break / snooze / end early).
+- Stores config/state in standard XDG locations (easy to back up and inspect).
+- Includes a focus mode (temporary block / do-not-disturb) so you can suppress scheduled popups during meetings or deep work.
+
+![hypr-breaktimer popup screenshot](static/popup.png)
+![hypr-breaktimer breaktimer screenshot](static/breaktimer.png)
+
 ### Commands
 
-- `hypr-breaktimer show`: force open popup in a new terminal
+- `hypr-breaktimer show`: force open the popup UI immediately
 - `hypr-breaktimer tick`: headless scheduler entrypoint (spawns popup when due)
 - `hypr-breaktimer status`: print current config/state and next due time
 - `hypr-breaktimer block <duration>`: suppress scheduled popups for a duration (`0` = do not disturb)
@@ -89,6 +101,7 @@ Description=hypr-breaktimer (check if break is due)
 
 [Service]
 Type=oneshot
+KillMode=process
 ExecStart=%h/.local/bin/hypr-breaktimer tick
 ```
 
@@ -99,7 +112,7 @@ ExecStart=%h/.local/bin/hypr-breaktimer tick
 Description=Run hypr-breaktimer periodically
 
 [Timer]
-OnBootSec=1m
+OnActiveSec=1m
 OnUnitActiveSec=60s
 Persistent=true
 
@@ -129,11 +142,12 @@ Remove config/state too:
 
 ### Hyprland
 
-- When launched via `xdg-terminal-exec`, `tick` passes `--app-id=hypr-breaktimer` so you can match it in your window rules.
+- When launched via `xdg-terminal-exec`, the popup uses `app_id` and `title` from your config so you can match it in window rules.
+- Defaults: `hypr-breaktimer-popup`.
 
 Example rules:
 
 ```ini
-windowrule = opacity 0.8 0.8, match:app-id ^(hypr-breaktimer)$
-windowrule = maximize on, match:app-id ^(hypr-breaktimer)$
+windowrule = opacity 0.8 0.8, match:title ^(hypr-breaktimer-popup)$
+windowrule = maximize on, match:title ^(hypr-breaktimer-popup)$
 ```

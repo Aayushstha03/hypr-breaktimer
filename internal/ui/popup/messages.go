@@ -9,7 +9,6 @@ import (
 // Leave it empty to use the configured popup message.
 var defaultMessages = []string{
 	"Stand up. Your spine is not a banana.",
-	"Roll your shoulders. Yep, like that.",
 	"Unclench your jaw. Seriously.",
 	"Stretch for a sec. I’ll wait.",
 	"Posture check. Gravity is winning.",
@@ -18,7 +17,7 @@ var defaultMessages = []string{
 	"Your back called. It’s tired of being hunched.",
 	"Sit like a human, not a shrimp.",
 	"Posture check: Are you a question mark?",
-	"Move your body. Any movement. Yes, that counts.",
+	"Move your body. Any movement.",
 	"Stretch like a confused cat.",
 	"Helo, Your bones want attention.",
 	"You have been sitting in one shape for too long.",
@@ -36,12 +35,12 @@ var defaultMessages = []string{
 	"Slow breath. Drop your shoulders.",
 	"You’re doing fine. Take a breather.",
 	"git commit -m 'took a break'",
-	"This break is mandatory. The computer said so.",
+	"This break is mandatory. The Overlords said so.",
 	"Task failed successfully. Take a break.",
-	"Imagine a frog. That’s it.",
+	"Imagine a frog. Imagine it jumping away, go chase it.",
 	"Stretch like a cat that owns the place.",
 	"Go stare out a window dramatically.",
-	"It’s late. Consider stopping. Gently.",
+	// "It’s late. Consider stopping. Gently.",
 	"You have been productive. That is suspicious.",
 	"Take a break. Even CPUs throttle.",
 	"Step away before you start arguing with your code.",
@@ -60,8 +59,9 @@ var defaultMessages = []string{
 	"BLINK",
 	"STRETCH",
 	"PLEASEE",
+	"Pretend you're the giraffe's ancestor and the tree is trynna grow taller than you",
 	"Stand up before your spine files a complaint.",
-	"You have been still for… too long.",
+	"You have been still, for too long...",
 	"This is your sign. Yes, this one.",
 	"Take a break. The vibes are off. I can feel them.",
 	"Pause. Rehydrate. Continue existing.",
@@ -96,10 +96,9 @@ var defaultMessages = []string{
 var exitAttemptMessages = []string{
 	"Nice Try...",
 	"Attempt Denied...",
-	"No (yeah the one with Bugs Bunny)",
+	"No. (yeah the one with Bugs Bunny)",
 	"Breaks are non-negotiable.",
-	"sudo: permission denied (you are not root, go stretch).",
-	"I am not trapped in here with you, you are trapped in here with me.",
+	"sudo: permission denied (you are not rooted, go stretch).",
 }
 
 func pickRandomMessage(fallback string) string {

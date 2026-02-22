@@ -74,9 +74,6 @@ func show(ctx context.Context, mode showMode) error {
 		if cfg.QuietHours.Enabled && config.InQuietHours(now, quietWindows) {
 			return nil
 		}
-		if st.SnoozedUntil != nil && now.Before(*st.SnoozedUntil) {
-			return nil
-		}
 
 		// First run: establish a reference point so the interval can elapse.
 		if st.LastBreakCompletedAt == nil && st.LastBreakStartedAt == nil && st.LastPopupShownAt == nil {
@@ -94,6 +91,45 @@ func show(ctx context.Context, mode showMode) error {
 		}
 
 		nextDue := ref.Add(cfg.Schedule.WorkInterval.Duration())
+
+		// Occasional nudge notifications (not affected by snooze).
+		// Suppressed by DND, quiet hours and blocking.
+		if st.LastNudgeNotifiedAt == nil || now.Sub(*st.LastNudgeNotifiedAt) >= 10*time.Minute {
+			nearPopup := false
+			if st.LastPopupShownAt != nil && now.Sub(*st.LastPopupShownAt) < 3*time.Minute {
+				nearPopup = true
+			}
+			// Avoid nudges right before a popup is due (unless snoozed).
+			if (st.SnoozedUntil == nil || now.After(*st.SnoozedUntil)) && now.Before(nextDue) && nextDue.Sub(now) <= 3*time.Minute {
+				nearPopup = true
+			}
+			if !nearPopup {
+				name, msg := RandomNudgeMessage()
+				if err := notify(ctx, name, msg); err == nil {
+					st.LastNudgeNotifiedAt = &now
+					_ = state.SaveAtomic(statePath, st)
+				}
+			}
+		}
+
+		// Snooze suppresses popup and break-soon reminder.
+		if st.SnoozedUntil != nil && now.Before(*st.SnoozedUntil) {
+			return nil
+		}
+
+		// Break-soon reminder: once, 2 minutes before due.
+		soonAt := nextDue.Add(-2 * time.Minute)
+		if (now.Equal(soonAt) || now.After(soonAt)) && now.Before(nextDue) {
+			already := st.LastBreakSoonNotifiedFor != nil && st.LastBreakSoonNotifiedFor.Equal(nextDue)
+			if !already {
+				if err := notify(ctx, "hypr-breaktimer", "Break in 2 minutes"); err == nil {
+					due := nextDue
+					st.LastBreakSoonNotifiedFor = &due
+					_ = state.SaveAtomic(statePath, st)
+				}
+			}
+		}
+
 		if now.Before(nextDue) {
 			return nil
 		}

@@ -19,8 +19,32 @@ Tiny Go + Bubble Tea break reminder for Hyprland.
 - `hypr-breaktimer show`: force open the popup UI immediately
 - `hypr-breaktimer tick`: headless scheduler entrypoint (spawns popup when due)
 - `hypr-breaktimer status`: print current config/state and next due time
+- `hypr-breaktimer bar`: print a minimal one-line status for Waybar
 - `hypr-breaktimer block <duration>`: suppress scheduled popups for a duration (`0` = do not disturb)
 - `hypr-breaktimer unblock`: disable do not disturb and clear any active block
+
+### Waybar
+
+Use the `bar` command with a 60s interval:
+
+```jsonc
+{
+  "custom/hypr-breaktimer": {
+    "exec": "hypr-breaktimer bar",
+    "interval": 60
+  }
+}
+```
+
+Output:
+
+- `working <N>m`
+- `snoozed <N>m`
+- `break <N>m`
+- `blocked <N>m`
+- `dnd`
+- `quiet`
+- `unknown`
 
 ### Config
 

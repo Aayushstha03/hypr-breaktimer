@@ -9,15 +9,15 @@ import (
 )
 
 func (m model) View() string {
-	accent := lipgloss.Color("6")
-	accentSuccess := lipgloss.Color("10")
-	mutedC := lipgloss.Color("8")
+	accent := lipgloss.Color("2")
+	accentSuccess := lipgloss.Color("3")
+	mutedC := lipgloss.Color("7")
 	muted := lipgloss.NewStyle().Foreground(mutedC).Render
 
 	compact := m.width > 0 && m.height > 0 && (m.width < 60 || m.height < 18)
 
 	motivationStyle := lipgloss.NewStyle().Bold(true).Foreground(accentSuccess)
-	nudgeStyle := lipgloss.NewStyle().Bold(true).Foreground(accentSuccess)
+	nudgeStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("1"))
 	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(accent)
 	dividerStyle := lipgloss.NewStyle().Foreground(mutedC)
 	progressStyle := lipgloss.NewStyle().Foreground(accent)
@@ -54,8 +54,7 @@ func (m model) View() string {
 			muted(fmt.Sprintf("for %s", m.breakDuration)) + "\n\n" +
 			dividerLine +
 			muted("b / enter  start break") + "\n" +
-			muted(fmt.Sprintf("s          snooze (%s)", m.snoozeDuration)) + "\n" +
-			muted("q / esc    quit")
+			muted(fmt.Sprintf("s          snooze (%s)", m.snoozeDuration)) + "\n"
 	case stateBreaking:
 		remaining := max(time.Until(m.breakEndsAt), 0)
 		pm := m.progress

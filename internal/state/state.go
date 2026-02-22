@@ -21,14 +21,16 @@ const (
 )
 
 type State struct {
-	LastBreakStartedAt   *time.Time `json:"last_break_started_at,omitempty"`
-	LastBreakCompletedAt *time.Time `json:"last_break_completed_at,omitempty"`
-	LastPopupShownAt     *time.Time `json:"last_popup_shown_at,omitempty"`
-	SnoozedUntil         *time.Time `json:"snoozed_until,omitempty"`
-	BlockedUntil         *time.Time `json:"blocked_until,omitempty"`
-	DoNotDisturb         bool       `json:"do_not_disturb,omitempty"`
-	LastAction           Action     `json:"last_action,omitempty"`
-	LastActionAt         *time.Time `json:"last_action_at,omitempty"`
+	LastBreakStartedAt       *time.Time `json:"last_break_started_at,omitempty"`
+	LastBreakCompletedAt     *time.Time `json:"last_break_completed_at,omitempty"`
+	LastPopupShownAt         *time.Time `json:"last_popup_shown_at,omitempty"`
+	LastBreakSoonNotifiedFor *time.Time `json:"last_break_soon_notified_for,omitempty"`
+	LastNudgeNotifiedAt      *time.Time `json:"last_nudge_notified_at,omitempty"`
+	SnoozedUntil             *time.Time `json:"snoozed_until,omitempty"`
+	BlockedUntil             *time.Time `json:"blocked_until,omitempty"`
+	DoNotDisturb             bool       `json:"do_not_disturb,omitempty"`
+	LastAction               Action     `json:"last_action,omitempty"`
+	LastActionAt             *time.Time `json:"last_action_at,omitempty"`
 }
 
 func Load(path string) (State, error) {

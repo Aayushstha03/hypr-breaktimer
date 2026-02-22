@@ -98,7 +98,7 @@ func newModel(cfg config.Config) model {
 	st, _ := state.Load(statePath)
 
 	pm := progress.New(progress.WithoutPercentage())
-	pm.FullColor = "6"  // ANSI cyan (theme-defined)
+	pm.FullColor = "2"  // ANSI cyan (theme-defined)
 	pm.EmptyColor = "8" // ANSI bright black (theme-defined)
 
 	return model{
@@ -144,7 +144,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		s := msg.String()
 		switch s {
-		case "ctrl+c", "esc", "q":
+		case "ctrl+c":
 			// Treat quitting as break taken (except snooze).
 			m.writeAction(state.ActionCompleted)
 			m.exitCode = 0

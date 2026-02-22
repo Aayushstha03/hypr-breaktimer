@@ -12,7 +12,7 @@ var defaultMessages = []string{
 	"Unclench your jaw. Seriously.",
 	"Stretch for a sec. I’ll wait.",
 	"Posture check. Gravity is winning.",
-	"Remember that joke about the shrimp fried rice, and its actually a shrimp frying the rice the kitchen. yea. You look like that shrimp.",
+	"Remember that joke about the shrimp fried rice, and its actually a shrimp frying the rice in the kitchen. yeaa. You look like that shrimp.",
 	"Neck stretch time. Pretend you’re a Brontosaurus reaching a tall leaf.",
 	"Your back called. It’s tired of being hunched.",
 	"Sit like a human, not a shrimp.",
